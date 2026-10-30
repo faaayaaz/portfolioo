@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Link, Route, Routes, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ArrowUp, ArrowUpRight } from "lucide-react";
@@ -16,9 +16,7 @@ function RouteScroll() {
         const el = document.getElementById(location.hash.slice(1));
         if (el) {
           el.scrollIntoView({
-            behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-              ? "instant"
-              : "smooth",
+            behavior: "instant",
           });
           clearInterval(timer);
         }
@@ -29,48 +27,62 @@ function RouteScroll() {
   }, [location]);
   return null;
 }
-function Pointer() {
+function ScrollUI() {
+  const bar = useRef<HTMLDivElement>(null),
+    [show, setShow] = useState(false);
   useEffect(() => {
-    if (
-      !matchMedia(
-        "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)",
-      ).matches
-    )
-      return;
-    const el = document.getElementById("cursor-halo");
-    if (!el) return;
     let frame = 0;
-    const move = (e: PointerEvent) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        el.style.transform = `translate3d(${e.clientX - 23}px,${e.clientY - 23}px,0)`;
-        el.classList.toggle(
-          "visible",
-          Boolean(
-            (e.target as HTMLElement).closest(".magnetic, .project-card"),
-          ),
-        );
-      });
+    const update = () => {
+      frame = 0;
+      const height = document.documentElement.scrollHeight - innerHeight;
+      const progress = height > 0 ? scrollY / height : 0;
+      if (bar.current) bar.current.style.transform = `scaleX(${progress})`;
+      setShow((old) => (old === progress > 0.15 ? old : progress > 0.15));
     };
-    window.addEventListener("pointermove", move, { passive: true });
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    const observer = new ResizeObserver(schedule);
+    observer.observe(document.body);
+    schedule();
     return () => {
-      window.removeEventListener("pointermove", move);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      observer.disconnect();
       cancelAnimationFrame(frame);
     };
   }, []);
-  return <div id="cursor-halo" aria-hidden="true" />;
+  return (
+    <>
+      <div
+        ref={bar}
+        className="scroll-progress"
+        style={{ transform: "scaleX(0)" }}
+      />
+      {show && (
+        <button
+          className="back-top icon-button"
+          aria-label="Back to top"
+          onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
+        >
+          <ArrowUp size={18} />
+        </button>
+      )}
+    </>
+  );
 }
 export default function App({ siteOrigin }: { siteOrigin?: string }) {
   const [theme, setThemeState] = useState<Theme>(() => {
-      const current =
-        typeof document !== "undefined"
-          ? document.documentElement.dataset.theme
-          : "observatory";
-      return themes.some((t) => t.id === current)
-        ? (current as Theme)
+    const current =
+      typeof document !== "undefined"
+        ? document.documentElement.dataset.theme
         : "observatory";
-    }),
-    [progress, setProgress] = useState(0);
+    return themes.some((t) => t.id === current)
+      ? (current as Theme)
+      : "observatory";
+  });
   const location = useLocation();
   const setTheme = (t: Theme) => {
     document.documentElement.dataset.theme = t;
@@ -79,15 +91,6 @@ export default function App({ siteOrigin }: { siteOrigin?: string }) {
       localStorage.setItem("fayaz-theme", t);
     } catch {}
   };
-  useEffect(() => {
-    const scroll = () => {
-      const height = document.documentElement.scrollHeight - innerHeight;
-      setProgress(height > 0 ? scrollY / height : 0);
-    };
-    window.addEventListener("scroll", scroll, { passive: true });
-    scroll();
-    return () => window.removeEventListener("scroll", scroll);
-  }, []);
   const site = (
     siteOrigin ||
     import.meta.env.VITE_SITE_URL ||
@@ -129,10 +132,7 @@ export default function App({ siteOrigin }: { siteOrigin?: string }) {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <div
-        className="scroll-progress"
-        style={{ transform: `scaleX(${progress})` }}
-      />
+      <ScrollUI />
       <Navigation theme={theme} setTheme={setTheme} />
       <main id="main">
         <RouteScroll />
@@ -140,12 +140,12 @@ export default function App({ siteOrigin }: { siteOrigin?: string }) {
           fallback={
             <div className="page-loading container" role="status">
               <span className="status-dot" />
-              Opening the observatory…
+              Loading the portfolio…
             </div>
           }
         >
           <Routes>
-            <Route path="/" element={<Home theme={theme} />} />
+            <Route path="/" element={<Home />} />
             <Route path="/projects/:slug" element={<Project />} />
             <Route
               path="*"
@@ -159,7 +159,7 @@ export default function App({ siteOrigin }: { siteOrigin?: string }) {
                   </h1>
                   <Button asChild>
                     <Link to="/">
-                      Back to the observatory <ArrowUpRight size={18} />
+                      Back to the portfolio <ArrowUpRight size={18} />
                     </Link>
                   </Button>
                 </div>
@@ -187,9 +187,7 @@ export default function App({ siteOrigin }: { siteOrigin?: string }) {
             e.preventDefault();
             window.scrollTo({
               top: 0,
-              behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-                ? "instant"
-                : "smooth",
+              behavior: "instant",
             });
           }}
           aria-label="Back to top"
@@ -197,23 +195,6 @@ export default function App({ siteOrigin }: { siteOrigin?: string }) {
           <ArrowUp size={17} />
         </a>
       </footer>
-      <Pointer />
-      {progress > 0.15 && (
-        <button
-          className="back-top icon-button"
-          aria-label="Back to top"
-          onClick={() =>
-            window.scrollTo({
-              top: 0,
-              behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-                ? "instant"
-                : "smooth",
-            })
-          }
-        >
-          <ArrowUp size={18} />
-        </button>
-      )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -22,11 +22,6 @@ export default function LiveLab({ compact = false }: { compact?: boolean }) {
   const [department, setDepartment] = useState("all"),
     [period, setPeriod] = useState("six"),
     [metric, setMetric] = useState<"visits" | "revenue">("visits");
-  const [animate, setAnimate] = useState(false);
-  useEffect(
-    () => setAnimate(!matchMedia("(prefers-reduced-motion: reduce)").matches),
-    [],
-  );
   const id = useId().replace(/:/g, "");
   const data = useMemo(
     () => summarize(department, period),
@@ -230,7 +225,7 @@ export default function LiveLab({ compact = false }: { compact?: boolean }) {
               stroke="var(--chart)"
               strokeWidth={2.5}
               fill={`url(#${id}-fill)`}
-              isAnimationActive={animate}
+              isAnimationActive={false}
               activeDot={{
                 r: 5,
                 fill: "var(--accent)",

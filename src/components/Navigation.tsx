@@ -79,7 +79,7 @@ export function Navigation({ theme, setTheme }: Props) {
                     <div>
                       <Dialog.Title>Your point of view.</Dialog.Title>
                       <Dialog.Description>
-                        Five ways to explore the observatory.
+                        Choose the colors and contrast that suit you.
                       </Dialog.Description>
                     </div>
                     <Dialog.Close

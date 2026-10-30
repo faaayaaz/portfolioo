@@ -1,34 +1,36 @@
-# Data Island validation — 30 October 2026
+# Portfolio validation — 30 October 2026
 
-The redesigned production application was built and run with Node 24 and Chromium. This verifies the current cloud instance and the tested build; it is not a claim of deployment or validation on a public host.
+This revision replaces the rejected 3D island and directly addresses reported lag. Local production validation used Node 24 and Chromium. It does not establish performance on the user's computer or a deployed host.
 
-| Check | Result |
-| --- | --- |
-| TypeScript + client/server production builds | Passed |
-| Contact input/spam-protection unit tests | 5 passed |
-| Browser tests against the production server | 13 passed |
-| Actual 3D rendering and WASD rover movement | Passed in Chromium with software WebGL |
-| Four map destinations, discovery counter and restart | Passed |
-| Project browser, keyboard navigation and case-study links | Passed |
-| Automated WCAG AA checks | Passed in all five themes |
-| Responsive layout / horizontal overflow | Passed at 360, 768, 1024, 1440, 3840 pixels |
-| Case studies, PDF download, lab filters, CSV export, theme persistence, command menu, mobile drawer and contact draft | Passed |
+| Check                                                                           | Result                                                |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| TypeScript + production client/server build                                     | Passed                                                |
+| Contact-validation tests                                                        | 5 passed                                              |
+| Browser checks                                                                  | 13 passed |
+| Responsive layout, no horizontal overflow                                       | Passed at 360, 768, 1024, 1440, 3840px                |
+| Automated WCAG AA checks                                                        | Passed in all five themes                             |
+| Hero filter, exact Cardiology total (1,252), metric switch and data table       | Passed                                                |
+| Project selection, keyboard navigation and case-study links                     | Passed                                                |
+| Explicit full-dashboard loading, filters and CSV export                         | Passed                                                |
+| Résumé PDF, mobile navigation, command palette, persisted themes, contact draft | Passed                                                |
+| Initial WebGL canvas / heavy chart module                                       | None; chart module loads only when opened             |
+| Runtime errors during visual/benchmark checks                                   | None                                                  |
 
-Latest Lighthouse mobile audit of the local production homepage:
+## Responsiveness comparison
 
-| Category | Score |
-| --- | ---: |
-| Performance | 96 |
-| Accessibility | 100 |
-| Best practices | 100 |
-| SEO | 100 |
+The same controlled local test, with a 4× CPU slowdown and software WebGL available, observed 31 frames in about three seconds on the old island and 182 on the new portfolio. The 95th-percentile frame interval changed from 116.6 ms to 16.7 ms; frame intervals over 34 ms changed from 30 to zero. Initial encoded JavaScript delivery decreased from 376,346 to 100,593 bytes, approximately 73%.
 
-First contentful paint: 2.3 seconds. Largest contentful paint: 2.3 seconds. Total blocking time: 10 milliseconds. Cumulative layout shift: 0.011. These measurements cover the illustrated-map initial mobile experience. They do not measure 3D frame rate or guarantee the same score after explicitly enabling 3D on a phone. Scores vary by hosting, network, device and run. Automated accessibility results are not a complete manual audit.
+See [the performance investigation](PERFORMANCE.md) for the method and limits. This measures frame contention, not standardized INP, and does not guarantee identical behavior on every device. The earlier mobile Lighthouse result measured the map fallback and was not a measure of the rejected 3D experience's smoothness.
 
-The island scene is a lazy-loaded desktop enhancement and an explicit mobile option. It starts as an illustrated map on screens below 700px, reduced-motion, low-power and data-saving configurations. Every destination and case study remains reachable through HTML controls, including after a WebGL failure. The rendering loop pauses when offscreen or the document is hidden. The large optional Three.js chunk is approximately 225 kB gzipped; it is not part of the initial mobile download. No fixed frame-rate guarantee is made.
+## Current mobile Lighthouse audit
 
-The full original contact, project and dashboard checks were retained; the new checks exercise meaningful interactive behavior rather than only the presence of a canvas. Windows-compatible `npm start` remains in place. Installation dependencies and lockfile are unchanged by the redesign.
+| Category       | Score |
+| -------------- | ----: |
+| Performance    |    97 |
+| Accessibility  |   100 |
+| Best practices |   100 |
+| SEO            |   100 |
 
-Direct SMTP delivery is still untested because no provider is configured. The contact flow prepares a complete email draft without claiming delivery. Calendar scheduling uses an email request. Project visuals and healthcare data remain illustrative/synthetic. Arabic localization and original employer dashboard screenshots are not included.
+First contentful paint: 2.1 seconds. Largest contentful paint: 2.3 seconds. Total blocking time: 10 ms. Cumulative layout shift: 0.001. This is a local simulated-mobile homepage audit; scores vary by hosting, device, network and run. Automated accessibility tests do not replace a manual audit.
 
-See [design research](DESIGN-RESEARCH.md) for the professional references actually examined and the live-network limitations. No website deployment or environment publication was performed for this redesign.
+Direct SMTP delivery remains untested without provider settings. The tested contact flow offers a complete email draft and does not claim delivery. Calendar scheduling uses an email request. Healthcare examples and visuals are synthetic/illustrative; Arabic localization and original employer dashboard screenshots are not included. No environment publication or website deployment was performed for this revision.

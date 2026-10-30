@@ -57,8 +57,8 @@ export const themes = [
   {
     id: "observatory",
     name: "Observatory Dark",
-    color: "#c4f29b",
-    description: "Deep green · soft lime",
+    color: "#a8baff",
+    description: "Deep navy · soft blue",
   },
   {
     id: "clinical",
@@ -174,6 +174,7 @@ export const experience = [
 ];
 export type Project = {
   slug: string;
+  label: string;
   number: string;
   title: string;
   category: string;
@@ -192,6 +193,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "healthcare-operations",
+    label: "Healthcare analytics",
     number: "01",
     title: "A pulse on healthcare operations.",
     category: "BUSINESS INTELLIGENCE",
@@ -214,6 +216,7 @@ export const projects: Project[] = [
   },
   {
     slug: "skin-cancer-detection",
+    label: "Skin cancer detection",
     number: "02",
     title: "Finding patterns. Supporting care.",
     category: "MACHINE LEARNING",
@@ -236,6 +239,7 @@ export const projects: Project[] = [
   },
   {
     slug: "workforce-analytics",
+    label: "Workforce analytics",
     number: "03",
     title: "Understanding the human side of data.",
     category: "PEOPLE ANALYTICS",
@@ -258,6 +262,7 @@ export const projects: Project[] = [
   },
   {
     slug: "connected-home",
+    label: "Connected home",
     number: "04",
     title: "Small signals. Connected systems.",
     category: "SYSTEMS & IOT",
@@ -298,10 +303,10 @@ export const ui = {
 };
 export const sections = {
   work: {
-    title: "Four stops.",
-    emphasis: "A world of questions.",
+    title: "The work behind",
+    emphasis: "the numbers.",
     description:
-      "Pick a destination. Explore the question, the approach, and what came out of it.",
+      "Explore a project: the question, the method, and what the result actually means.",
     note: "Original project visuals are illustrative. Healthcare demos use synthetic data only.",
   },
   about: { title: "Curious by nature.", emphasis: "Precise by practice." },
@@ -353,4 +358,15 @@ export const sections = {
       text: "Build clear reporting that fits the real workflow.",
     },
   ],
+};
+
+export const studioContent = {
+  eyebrow: "HEALTHCARE ANALYTICS / UAE",
+  headline: ["Good data.", "Better decisions."],
+  description:
+    "I build the reporting, data models, and workflows that help healthcare teams see clearly — and act with confidence.",
+  specialties: ["Power BI", "SQL", "ETL", "Healthcare"],
+  boardSubtitle: "A practical preview of how I think about reporting.",
+  boardFootnote: "Synthetic data. No patient records.",
+  previewNote: "Change a department. See the numbers respond.",
 };

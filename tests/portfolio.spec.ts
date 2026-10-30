@@ -14,11 +14,8 @@ test("responsive layouts preserve content without horizontal overflow", async ({
   for (const width of [360, 768, 1024, 1440, 3840]) {
     await page.setViewportSize({ width, height: 960 });
     await page.goto("/");
-    await expect(page.locator("h1")).toContainText("Welcome to");
-    await expect(page.locator(".world-stage")).toBeVisible();
-    await expect(
-      page.getByRole("navigation", { name: "Island destinations" }),
-    ).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Good data.");
+    await expect(page.locator(".signal-board")).toBeVisible();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -83,6 +80,9 @@ test("live dashboard filters, metric switch and CSV export use the selected reco
 }) => {
   await page.goto("/#lab");
   const lab = page.locator("#lab");
+  await lab
+    .getByRole("button", { name: "Open interactive dashboard", exact: true })
+    .click();
   await expect(lab.locator(".live-dashboard")).toBeVisible();
   const initial = await lab.locator(".dashboard-kpi").first().innerText();
   await lab
@@ -153,6 +153,9 @@ for (const theme of [
 ])
   test(`${theme} theme passes automated WCAG AA checks`, async ({ page }) => {
     await page.goto("/#lab");
+    await page
+      .getByRole("button", { name: "Open interactive dashboard", exact: true })
+      .click();
     await expect(page.locator(".live-dashboard")).toBeVisible();
     await page.evaluate((t) => {
       document.documentElement.dataset.theme = t;
@@ -173,93 +176,61 @@ for (const theme of [
     ).toEqual([]);
   });
 
-test("illustrated island visits all four destinations and resets discovery progress", async ({
+test("hero sample filters and chart metrics update real calculated values", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.locator(".world-mode")).toContainText("MAP EXPLORER");
-  const dock = page.getByRole("navigation", { name: "Island destinations" });
-  for (const [i, name] of [
-    "Care Campus",
-    "Neural Garden",
-    "People Park",
-    "Connected Cove",
-  ].entries()) {
-    await dock.getByRole("button", { name: new RegExp(name) }).click();
-    await expect(
-      page.getByRole("complementary", { name: `${name} destination` }),
-    ).toBeVisible();
-    await expect(page.locator(".world-passport strong")).toContainText(
-      `${i + 1}`,
-    );
-  }
-  await expect(page.locator(".world-project-panel a")).toHaveAttribute(
-    "href",
-    "/projects/connected-home",
-  );
-  await page.getByRole("button", { name: "Restart exploration" }).click();
-  await expect(page.locator(".world-passport strong")).toContainText("0");
-  await expect(page.locator(".world-project-panel")).toHaveCount(0);
+  const board = page.locator(".signal-board");
+  await expect(board.getByTestId("signal-visits")).toHaveText("6,204");
+  await board
+    .getByLabel("Explore a department", { exact: true })
+    .selectOption("Cardiology");
+  await expect(board.getByTestId("signal-visits")).toHaveText("1,252");
+  await board.getByRole("button", { name: "Wait time", exact: true }).click();
+  await expect(
+    board.getByRole("img", { name: /Average wait in minutes/ }),
+  ).toHaveAttribute("aria-label", /Average wait in minutes/);
+  await board.getByText("View data", { exact: true }).click();
+  await expect(board.getByRole("table")).toBeVisible();
+  await expect(board.getByRole("row")).toHaveCount(7);
 });
-test("project browser supports tabs, keyboard navigation and case-study links", async ({
+test("project browser supports selection, keyboard navigation and case-study links", async ({
   page,
 }) => {
   await page.goto("/#work");
-  await page.getByRole("tab", { name: /Neural Garden/ }).click();
+  await page.getByRole("tab", { name: /Skin cancer detection/ }).click();
   await expect(
-    page.getByRole("tabpanel", { name: /Neural Garden/ }),
+    page.getByRole("tabpanel", { name: /Skin cancer detection/ }),
   ).toContainText("Finding patterns. Supporting care.");
-  await expect(page.locator(".explorer-case-link")).toHaveAttribute(
+  await expect(page.locator(".work-case-link")).toHaveAttribute(
     "href",
     "/projects/skin-cancer-detection",
   );
-  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowDown");
   await expect(
-    page.getByRole("tabpanel", { name: /People Park/ }),
+    page.getByRole("tabpanel", { name: /Workforce analytics/ }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Next project", exact: true }).click();
-  await expect(page.locator(".explorer-story")).toContainText(
-    "Small signals. Connected systems.",
-  );
 });
-test("3D island renders and keyboard driving moves the rover", async ({
+test("initial homepage avoids WebGL and defers the heavy chart library until requested", async ({
   page,
 }) => {
+  const requests: string[] = [];
+  page.on("request", (r) => {
+    if (r.resourceType() === "script") requests.push(r.url());
+  });
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  const errors: string[] = [];
-  page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
-  await expect(page.locator(".world-mode")).toContainText(
-    "INTERACTIVE 3D WORLD",
-    { timeout: 30000 },
-  );
-  await expect(page.locator(".world-canvas-layer canvas")).toBeVisible();
+  await page.waitForTimeout(1500);
+  await expect(page.locator("canvas")).toHaveCount(0);
+  expect(
+    requests.some((url) =>
+      /IslandScene|react-three|NetworkScene|LiveLab|recharts|gsap|framer/i.test(
+        url,
+      ),
+    ),
+  ).toBe(false);
   await page
-    .getByRole("button", { name: "Take the wheel", exact: true })
+    .getByRole("button", { name: "Open interactive dashboard", exact: true })
     .click();
-  const before = Number(
-    await page.locator(".world-stage").getAttribute("data-rover-x"),
-  );
-  await page.keyboard.down("w");
-  await page.waitForTimeout(1000);
-  await page.keyboard.up("w");
-  await page.waitForTimeout(400);
-  const after = Number(
-    await page.locator(".world-stage").getAttribute("data-rover-x"),
-  );
-  expect(after).toBeLessThan(before - 0.1);
-  await page
-    .getByRole("navigation", { name: "Island destinations" })
-    .getByRole("button", { name: /People Park/ })
-    .click();
-  await expect(
-    page.getByRole("complementary", { name: "People Park destination" }),
-  ).toBeVisible();
-  await expect(page.locator(".world-project-panel a")).toHaveAttribute(
-    "href",
-    "/projects/workforce-analytics",
-  );
-  await page.getByRole("button", { name: "Switch to accessible map" }).click();
-  await expect(page.locator(".world-mode")).toContainText("MAP EXPLORER");
-  expect(errors).toEqual([]);
+  await expect(page.locator(".live-dashboard")).toBeVisible();
 });

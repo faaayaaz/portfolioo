@@ -1,116 +1,107 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpRight,
-  BrainCircuit,
-  Cpu,
-  Stethoscope,
-  Users,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { projects } from "../data/content";
-import { worldContent } from "../data/world";
 import ProjectVisual from "./ProjectVisual";
-const icons = [Stethoscope, BrainCircuit, Users, Cpu];
 export default function ProjectExplorer() {
   const [index, setIndex] = useState(0);
-  const project = projects[index],
-    station = worldContent.stations[index];
+  const project = projects[index];
   return (
-    <div className="project-explorer">
+    <div className="work-browser">
       <div
-        className="explorer-tabs"
+        className="work-index"
         role="tablist"
         aria-label="Explore projects"
+        aria-orientation="vertical"
       >
-        {worldContent.stations.map((s, i) => {
-          const Icon = icons[i];
-          return (
-            <button
-              role="tab"
-              aria-selected={index === i}
-              aria-controls="project-preview"
-              id={`project-tab-${i}`}
-              key={s.id}
-              onClick={() => setIndex(i)}
-              tabIndex={index === i ? 0 : -1}
-              onKeyDown={(e) => {
-                if (
-                  ["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)
-                ) {
-                  e.preventDefault();
-                  const next =
-                    e.key === "Home"
-                      ? 0
-                      : e.key === "End"
-                        ? 3
-                        : (i + (e.key === "ArrowRight" ? 1 : 3)) % 4;
-                  setIndex(next);
-                  document.getElementById(`project-tab-${next}`)?.focus();
-                }
-              }}
-            >
-              <span>{s.number}</span>
-              <Icon size={17} />
-              {s.name}
-              <ArrowUpRight size={14} />
-            </button>
-          );
-        })}
+        {projects.map((p, i) => (
+          <button
+            role="tab"
+            aria-selected={index === i}
+            aria-controls="project-preview"
+            id={`project-tab-${i}`}
+            key={p.slug}
+            onClick={() => setIndex(i)}
+            tabIndex={index === i ? 0 : -1}
+            onKeyDown={(e) => {
+              if (
+                [
+                  "ArrowUp",
+                  "ArrowDown",
+                  "ArrowLeft",
+                  "ArrowRight",
+                  "Home",
+                  "End",
+                ].includes(e.key)
+              ) {
+                e.preventDefault();
+                const next =
+                  e.key === "Home"
+                    ? 0
+                    : e.key === "End"
+                      ? 3
+                      : (i +
+                          (["ArrowDown", "ArrowRight"].includes(e.key)
+                            ? 1
+                            : 3)) %
+                        4;
+                setIndex(next);
+                document.getElementById(`project-tab-${next}`)?.focus();
+              }
+            }}
+          >
+            <span className="work-index-number">{p.number}</span>
+            <span>
+              <small>{p.category}</small>
+              <strong>{p.label}</strong>
+              <em>
+                {p.kind} · {p.year}
+              </em>
+            </span>
+            <ArrowUpRight size={19} />
+          </button>
+        ))}
+        <p className="work-index-note">
+          Four projects.
+          <br />
+          Different questions. Practical answers.
+        </p>
       </div>
       <div
         id="project-preview"
         role="tabpanel"
         aria-labelledby={`project-tab-${index}`}
-        className={`explorer-preview preview-${project.visual}`}
+        className={`work-preview preview-${project.visual}`}
       >
-        <div className="explorer-visual">
+        <div className="work-preview-art">
           <ProjectVisual type={project.visual} large />
-          <span className="explorer-stamp">
-            {project.kind} / {project.year}
+          <span>
+            {project.kind} / {project.year} · Illustrative visual
           </span>
         </div>
-        <div className="explorer-story">
-          <div className="explorer-project-meta">
-            <span>{station.category}</span>
-            <span>0{index + 1} / 04</span>
+        <div className="work-preview-copy">
+          <div className="work-copy-top">
+            <div>
+              <span className="eyebrow">{project.category}</span>
+              <h3>{project.title}</h3>
+            </div>
+            <div className="work-proof">
+              <strong>{project.stat}</strong>
+              <span>{project.statLabel}</span>
+            </div>
           </div>
-          <h3>{project.title}</h3>
           <p>{project.description}</p>
-          <div className="explorer-proof">
-            <strong>{project.stat}</strong>
-            <span>{project.statLabel}</span>
+          <div className="work-copy-bottom">
+            <div className="tags">
+              {project.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+            <Link className="work-case-link" to={`/projects/${project.slug}`}>
+              Read the case study
+              <ArrowRight size={17} />
+            </Link>
           </div>
-          <div className="tags">
-            {project.tags.map((t) => (
-              <span key={t}>{t}</span>
-            ))}
-          </div>
-          <Link
-            className="explorer-case-link magnetic"
-            to={`/projects/${project.slug}`}
-          >
-            Step inside the project
-            <ArrowUpRight size={20} />
-          </Link>
-        </div>
-      </div>
-      <div className="explorer-footer">
-        <span>Four explorations. Follow whichever question interests you.</span>
-        <div>
-          <button
-            aria-label="Previous project"
-            onClick={() => setIndex((i) => (i + 3) % 4)}
-          >
-            <ArrowLeft size={17} />
-          </button>
-          <button
-            aria-label="Next project"
-            onClick={() => setIndex((i) => (i + 1) % 4)}
-          >
-            <ArrowRight size={17} />
-          </button>
         </div>
       </div>
     </div>

@@ -13,7 +13,6 @@ export default defineConfig({
       args: [
         "--no-sandbox",
         "--disable-dev-shm-usage",
-        "--enable-unsafe-swiftshader",
       ],
     },
   },

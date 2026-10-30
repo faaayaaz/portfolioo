@@ -1,5 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "framer-motion";
+import { lazy, Suspense, useState } from "react";
 import {
   Activity,
   ArrowDown,
@@ -15,8 +14,6 @@ import {
   Plus,
   ShieldCheck,
 } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   certifications,
   experience,
@@ -25,88 +22,15 @@ import {
   skills,
 } from "../data/content";
 import Contact from "../components/Contact";
-import ImmersiveHero from "../components/world/ImmersiveHero";
+import StudioHero from "../components/StudioHero";
 import ProjectExplorer from "../components/ProjectExplorer";
 const LiveLab = lazy(() => import("../components/LiveLab"));
-gsap.registerPlugin(ScrollTrigger);
-function Count({ value, suffix }: { value: number; suffix: string }) {
-  const ref = useRef<HTMLSpanElement>(null),
-    inView = useInView(ref, { once: true }),
-    reduce = useReducedMotion();
-  const [n, setN] = useState(value);
-  useEffect(() => {
-    if (!inView || reduce) return;
-    let frame: number;
-    const start = performance.now();
-    const update = (now: number) => {
-      const p = Math.min((now - start) / 1200, 1);
-      setN(Math.round(value * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) frame = requestAnimationFrame(update);
-    };
-    frame = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(frame);
-  }, [value, inView, reduce]);
-  return (
-    <span ref={ref}>
-      {n}
-      <span className="metric-suffix">{suffix}</span>
-    </span>
-  );
-}
-export default function Home({ theme }: { theme: string }) {
-  const root = useRef<HTMLDivElement>(null),
-    reduce = useReducedMotion(),
-    [skill, setSkill] = useState(0),
+export default function Home() {
+  const [skill, setSkill] = useState(0),
     [labVisible, setLabVisible] = useState(false);
-  const labRef = useRef<HTMLElement>(null),
-    labInView = useInView(labRef, { margin: "400px", once: true });
-  useEffect(() => {
-    if (labInView) setLabVisible(true);
-  }, [labInView]);
-  useEffect(() => {
-    if (reduce) return;
-    const mm = gsap.matchMedia();
-    mm.add(
-      "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
-      () => {
-        ScrollTrigger.create({
-          trigger: ".experience-aside",
-          start: "top 140px",
-          endTrigger: ".experience-timeline",
-          end: "bottom 65%",
-          pin: true,
-          pinSpacing: false,
-          invalidateOnRefresh: true,
-        });
-      },
-      root,
-    );
-    return () => mm.revert();
-  }, [reduce]);
   return (
-    <div ref={root} className="explorer-home">
-      <ImmersiveHero theme={theme} />
-      <section id="impact" className="metrics-section">
-        <div className="container metrics-grid">
-          <div className="metrics-intro">
-            <span className="eyebrow">
-              LESS NOISE.
-              <br />
-              MORE IMPACT.
-            </span>
-            <Activity size={28} />
-          </div>
-          {profile.metrics.map((m) => (
-            <div className="metric" key={m.label} title={m.source}>
-              <strong>
-                <Count value={m.value} suffix={m.suffix} />
-              </strong>
-              <h2>{m.label}</h2>
-              <p>{m.detail}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+    <div className="studio-home">
+      <StudioHero />
       <section id="work" className="section container">
         <div className="section-heading">
           <span className="eyebrow">
@@ -149,7 +73,7 @@ export default function Home({ theme }: { theme: string }) {
                   alt="Muhammed Fayaz"
                 />
                 <div>
-                  <span className="eyebrow">BEHIND THE ISLAND</span>
+                  <span className="eyebrow">A LITTLE ABOUT ME</span>
                   <strong>Muhammed Fayaz</strong>
                   <span>Analyst. Builder. Curious by default.</span>
                 </div>
@@ -341,7 +265,7 @@ export default function Home({ theme }: { theme: string }) {
           </div>
         </div>
       </section>
-      <section id="lab" className="section container lab-section" ref={labRef}>
+      <section id="lab" className="section container lab-section">
         <div className="section-heading">
           <span className="eyebrow">
             <span className="section-number">05 /</span> THE LIVE LAB
@@ -363,7 +287,26 @@ export default function Home({ theme }: { theme: string }) {
             <LiveLab />
           </Suspense>
         ) : (
-          <DashboardSkeleton />
+          <div className="lab-invitation">
+            <div>
+              <span className="eyebrow">GO DEEPER</span>
+              <h3>Your questions. A working dashboard.</h3>
+              <p>
+                Explore department filters, compare reporting periods, switch
+                metrics, and export the selected sample data.
+              </p>
+              <span className="lab-sample-note">
+                Synthetic healthcare data · No confidential records
+              </span>
+            </div>
+            <button
+              className="button button-primary"
+              onClick={() => setLabVisible(true)}
+            >
+              Open interactive dashboard
+              <ArrowUpRight size={17} />
+            </button>
+          </div>
         )}
         <div className="lab-caption">
           <span>01 — Filter by department</span>
@@ -389,7 +332,7 @@ export function DashboardSkeleton() {
       <div />
       <div />
       <div />
-      <span>Preparing the observatory…</span>
+      <span>Loading the dashboard…</span>
     </div>
   );
 }

@@ -1,23 +1,14 @@
-# Fayaz — Data Island
+# Muhammed Fayaz — Data & BI Portfolio
 
-An explorable 3D personal portfolio for Muhammed Fayaz, built with React 18, TypeScript, Vite, Tailwind, styled shadcn/Radix primitives, Framer Motion, GSAP, React Three Fiber, and Recharts.
+A project-first portfolio built with React 18, TypeScript, Vite, styled Radix/shadcn primitives, Tailwind and an optional Recharts dashboard. The current revision replaces the rejected 3D island with lightweight, useful interactions.
 
-![Data Island — interactive 3D portfolio preview](docs/island-preview.png)
+![Portfolio preview](docs/portfolio-preview.png)
 
-## Explore the island
+## View in VS Code on Windows
 
-- Drive the rover with **WASD or arrow keys**, click the ground to move, or use the on-screen touch controls.
-- Click a building or use the destination dock to explore Care Campus, Neural Garden, People Park and Connected Cove. Each destination opens the corresponding real case study.
-- Collect six small insights, discover four destinations, zoom/rotate the view, or restart the exploration.
-- The project browser below the island supports tabs, arrow keys, and previous/next controls.
-- Phones under 700px, reduced-motion preferences, data-saving mode and low-power devices start with the illustrated map. Visitors can explicitly enter 3D. WebGL failures return to the map; all project content stays accessible without 3D. The scene pauses when offscreen or the page is hidden.
-- The procedural island and SVG map are original. See [design research](docs/DESIGN-RESEARCH.md) for the verified professional references and research limitations.
+Requires Node.js 22.9 or newer. Open your local `portfolioo` folder, stop an existing dev server with **Ctrl+C**, then use **Terminal → New Terminal**:
 
-## View in Visual Studio Code
-
-Install Node.js 22.9 or newer if `node --version` is unavailable. Open your local `portfolioo` folder in VS Code, choose **Terminal → New Terminal**, then run:
-
-```sh
+```powershell
 git fetch origin
 git switch feat/fayaz-portfolio
 git pull origin feat/fayaz-portfolio
@@ -25,21 +16,20 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-Open the local address printed by Vite in your own browser (normally localhost, port 5173). This example uses Windows PowerShell’s `npm.cmd` wrapper so execution-policy restrictions do not block npm. On macOS/Linux, use `npm` in place of `npm.cmd`. Run `npm run dev:api` in a second terminal to enable the contact API during development. The full production server is available with `npm run build` followed by `npm start` (port 3001).
+Open the local address printed by Vite in your own browser, normally localhost on port 5173. `npm.cmd` avoids PowerShell's script-execution restriction without changing your execution policy. On macOS/Linux use `npm` instead of `npm.cmd`.
 
-If you have not cloned the repository, use VS Code’s **Git: Clone** command with `https://github.com/faaayaaz/portfolioo.git`, open the cloned folder, and follow the same steps. You can also select the `feat/fayaz-portfolio` branch on GitHub and choose **Code → Download ZIP**.
+For the contact API during development, run `npm.cmd run dev:api` in a second terminal. Without SMTP, contact prepares an email draft and never claims successful delivery.
 
-## Develop
+The existing checkout is already the development workspace. A Git worktree is unnecessary unless explicitly requested.
 
-Requires Node.js 22.9+ (validated with Node 24).
+## What visitors can do
 
-```sh
-npm ci
-npm run dev:api  # terminal 1: contact API on port 3001
-npm run dev     # terminal 2: Vite on port 5173
-```
+- Filter the opening healthcare preview by department and switch between visits/wait-time metrics. Totals and the SVG chart update from the same small synthetic dataset. A native details control exposes the underlying monthly data.
+- Select one of four project case studies, using the mouse or keyboard. Each project has its own visual and an accessible full case-study route.
+- Explicitly open the full dashboard to use department/date filters, chart metric selection and CSV export. Recharts loads only when requested, with chart animation disabled.
+- Switch among five persisted color themes, use the command menu, download the supplied PDF résumé, and prepare a contact message.
 
-The existing checkout is the development workspace. A separate Git worktree is unnecessary.
+There is no WebGL, 3D scene, animation engine, scroll pinning, animated counter or pointer-following cursor. Scroll progress updates its own element and does not rerender the application. Fonts are self-hosted Latin subsets. These are structural fixes for the reported lag, not a promise that every device will have identical performance.
 
 ## Production
 
@@ -48,50 +38,40 @@ npm run build
 npm start
 ```
 
-The Express server renders the React pages into HTML before hydration and serves the built app, real HTTP 404s, route-specific social/SEO metadata, `robots.txt`, `sitemap.xml`, and the contact endpoint. Set `PORT` on the hosting platform if needed. For a custom domain, set `SITE_URL` at runtime and the matching `VITE_SITE_URL` before building. These values are optional during local development; metadata then uses the current origin. This is prepared for deployment, not already deployed.
+The cross-platform Node server renders the pages before hydration and serves route-specific metadata, static assets, sitemap, robots, contact and real HTTP 404 responses. The default port is 3001; set `PORT` on the hosting platform if needed. Set `SITE_URL` at runtime and matching `VITE_SITE_URL` at build time for a public domain. No website deployment is performed by these local setup instructions.
 
-Serve through the Node server for the complete experience. A static host needs SPA rewrites and a separate contact endpoint; without it, the form falls back to an email draft. `vite preview` is for inspecting assets, not production contact/SEO serving.
+`vite preview` is useful for inspecting assets, but the Node server provides the complete contact and SEO behavior. A static host needs SPA rewrites and a separate API or the email-draft fallback.
 
-## Edit content
+## Edit content and design
 
-- `src/data/content.ts`: profile, résumé-backed achievements, skills, experience, education, project case studies, major section copy, theme labels, and contact text.
-- `src/data/healthcare.ts`: deterministic synthetic demonstration data and KPI aggregation.
-- `src/styles.css`: shared theme/layout tokens. `src/world.css`: island and project-browser styling.
-- `src/data/world.ts`: island copy, destinations, coordinates and collectible insights.
-- `src/components/world/`: procedural 3D scene, illustrated map, controls and discovery UI.
-- `public/Muhammed_Fayaz_Resume.pdf`: the supplied résumé, downloaded by the site.
-- `public/images/`: optimized AVIF/WebP portrait assets. The portrait is an AI-assisted adaptation of the user's supplied waterfront photograph, rather than an unchanged original. Replace these files if an unmodified photograph is preferred. The other supplied photographs were not added.
-- `public/og-image.svg`: editable vector source for the social card; PNG and touch icon are provided.
-- `scripts/seo.mjs`: generates route metadata from the shared content file during builds. Do not edit `public/route-meta.json` directly.
+- `src/data/content.ts`: profile, achievements, projects, experience, education, section copy and the opening preview copy.
+- `src/data/healthcare.ts`: deterministic synthetic sample records and KPI aggregation.
+- `src/components/StudioHero.tsx` and `SignalBoard.tsx`: the opening layout and dependency-light SVG preview.
+- `src/components/ProjectExplorer.tsx`: accessible project selection and case-study links.
+- `src/styles.css`: shared components; `src/studio.css`: current layout/theme overrides; `src/fonts.css`: self-hosted font declarations.
+- `src/components/LiveLab.tsx`: the explicitly loaded Recharts dashboard.
+- `public/Muhammed_Fayaz_Resume.pdf`: the supplied résumé for download.
+- `public/images/`: portrait assets, including a small optimized avatar. The portrait is an AI-assisted adaptation of the supplied waterfront photograph, not an unchanged original.
+- `scripts/seo.mjs`: generated metadata from the shared content. Do not edit ignored `public/route-meta.json` directly.
 
-All charts and project visuals use illustrative or synthetic data. No patient records, confidential employer reports, real dashboard screenshots, invented client outcomes, or fabricated repository/demo links are included. The healthcare case study is a new portfolio demonstration; the other three projects come from the supplied résumé. The CNN’s 92%+ evaluation claim is labeled as résumé-reported, with no clinical efficacy claim.
+All healthcare data is synthetic. Project visuals are illustrations, not confidential employer screenshots. The healthcare case study is a portfolio demonstration; the other three projects come from the résumé. No clinical efficacy, invented client metrics, fake repository links or booking URLs are claimed.
 
-## Contact delivery
+## Contact configuration
 
-Without mail credentials, the validated form prepares a complete `mailto:` draft and tells the visitor to open and send it. It does not claim delivery. Email, LinkedIn, GitHub, and an email-based call request also work directly.
+Direct delivery optionally uses `SMTP_HOST`, `SMTP_PORT` (465 by default), `SMTP_FROM`, and provider-dependent `SMTP_USER`/`SMTP_PASSWORD`. Configure these privately in your hosting environment or an ignored `.env`; never commit credentials. TLS verification remains enabled; non-465 connections require STARTTLS. Without these settings, the tested workflow offers a complete email draft to send in the visitor's email app.
 
-For direct server delivery, configure `SMTP_HOST`, `SMTP_PORT` (defaults to 465), `SMTP_FROM`, and, if required by your provider, `SMTP_USER` and `SMTP_PASSWORD`. Use the production host’s secret manager or a private `.env`; never commit credentials. SMTP requires a host that allows outbound mail connections. TLS verification stays enabled; non-465 connections require STARTTLS. Direct SMTP delivery has not been validated without your provider settings.
-
-The endpoint validates input and origin, limits body size, checks a honeypot and submission timing, and rate-limits requests in memory. A multi-instance deployment should use a shared rate-limit store and its hosting platform’s documented proxy/IP configuration. The default limit is five attempts per IP per 15 minutes.
+The API validates input and origin, limits body size, checks a honeypot/submission timing and rate-limits attempts in memory. Multi-instance hosting should use a shared rate-limit store and its documented trusted-proxy configuration. Repeated contact tests may hit the five-attempt-per-15-minute limit; restart only your local test API when necessary.
 
 ## Validate
 
 ```sh
-npm test                 # 5 contact validation tests
-npm run build            # TypeScript + metadata generation + production build
-npm run test:browser      # Playwright responsive, navigation, lab, contact & axe checks
+npm test
+npm run build
+npm run test:browser
 ```
 
-The browser tests use `/usr/bin/chromium` in this cloud environment. Set `CHROMIUM_PATH` to an installed Chromium executable elsewhere. Start servers as above; Playwright will start them if they are absent. Tests expect unconfigured SMTP so draft mode can be exercised without sending mail. Restart your local API if repeat test runs reach the spam-protection rate limit.
+Browser tests use `/usr/bin/chromium` here; set `CHROMIUM_PATH` to an installed Chromium executable on another machine. Tests assume SMTP is unconfigured so they cannot send real mail. For an already running production server, set `TEST_BASE_URL` to its local origin before running browser tests.
 
-Checks cover widths 360, 768, 1024, 1440 and 3840, four case-study routes, CSV filtering, PDF downloads, mobile navigation, command palette, persisted themes, and automated WCAG AA checks for all five themes. Automated accessibility checks do not replace a full human audit. The default theme follows a visitor's light/dark system preference on first visit; explicit choices persist without a load flash. The island has an accessible illustrated-map alternative.
+See [validation](docs/VALIDATION.md), [the measured lag comparison](docs/PERFORMANCE.md) and [design notes](docs/DESIGN-RESEARCH.md).
 
-## Optional real content for launch
-
-- Public domain for canonical URLs and sitemap (set the two site-URL variables).
-- Mail provider settings for direct delivery; the email-draft flow works now.
-- A real calendar booking URL if instant scheduling is desired; the current link requests a call by email.
-- Original dashboard screenshots and verified public project repositories, if you want them included. No placeholder links are published.
-- EN/AR translation was optional in the brief and is not implemented.
-
-See [validation results](docs/VALIDATION.md) for the recorded production checks and Lighthouse measurements.
+For launch, optional real inputs remain: a public domain, SMTP provider settings for direct delivery, a calendar URL for instant booking, and original dashboard screenshots/public project repositories. Arabic localization is not implemented.
