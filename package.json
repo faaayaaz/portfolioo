@@ -1,0 +1,57 @@
+{
+  "name": "fayaz-observatory",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "dev:api": "node --env-file-if-exists=.env server/index.mjs",
+    "build": "tsc -b && node scripts/seo.mjs && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server",
+    "preview": "vite preview --host 0.0.0.0",
+    "start": "node --env-file-if-exists=.env server/start.mjs",
+    "test": "node --test server/contact.test.mjs",
+    "test:browser": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource-variable/fraunces": "^5.2.0",
+    "@fontsource-variable/inter": "^5.2.0",
+    "@fontsource-variable/space-grotesk": "^5.2.0",
+    "@fontsource/jetbrains-mono": "^5.2.0",
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@react-three/fiber": "^8.18.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "compression": "^1.8.2",
+    "express": "^5.1.0",
+    "framer-motion": "^12.4.7",
+    "gsap": "^3.12.7",
+    "lucide-react": "^0.468.0",
+    "nodemailer": "^7.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-helmet-async": "^2.0.5",
+    "react-router-dom": "^6.30.0",
+    "recharts": "^2.15.1",
+    "tailwind-merge": "^2.6.0",
+    "three": "^0.174.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^22.13.5",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@types/three": "^0.174.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "lighthouse": "^12.8.2",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.7.3",
+    "vite": "^6.1.0"
+  }
+}

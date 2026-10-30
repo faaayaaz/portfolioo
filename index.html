@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" data-theme="observatory">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#091512" />
+    <meta
+      name="description"
+      content="Muhammed Fayaz — Data & Business Intelligence Analyst in the UAE. Healthcare analytics, Power BI, SQL, ETL and reliable reporting."
+    />
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset="/images/fayaz-portrait-640.avif 640w, /images/fayaz-portrait.avif 1100w"
+      imagesizes="(max-width: 767px) 85vw, 40vw"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script>
+      try {
+        var t = localStorage.getItem("fayaz-theme");
+        document.documentElement.dataset.theme =
+          t ||
+          (matchMedia("(prefers-color-scheme: light)").matches
+            ? "clinical"
+            : "observatory");
+      } catch (e) {}
+    </script>
+    <title>Muhammed Fayaz — Data & BI Analyst</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

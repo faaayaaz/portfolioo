@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-server/
+.env
+.env.*
+!.env.example
+*.local
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+/public/route-meta.json
