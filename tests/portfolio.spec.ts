@@ -14,8 +14,11 @@ test("responsive layouts preserve content without horizontal overflow", async ({
   for (const width of [360, 768, 1024, 1440, 3840]) {
     await page.setViewportSize({ width, height: 960 });
     await page.goto("/");
-    await expect(page.locator("h1")).toContainText("Making complex");
-    await expect(page.locator(".hero-art img")).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Welcome to");
+    await expect(page.locator(".world-stage")).toBeVisible();
+    await expect(
+      page.getByRole("navigation", { name: "Island destinations" }),
+    ).toBeVisible();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -169,3 +172,94 @@ for (const theme of [
       })),
     ).toEqual([]);
   });
+
+test("illustrated island visits all four destinations and resets discovery progress", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(".world-mode")).toContainText("MAP EXPLORER");
+  const dock = page.getByRole("navigation", { name: "Island destinations" });
+  for (const [i, name] of [
+    "Care Campus",
+    "Neural Garden",
+    "People Park",
+    "Connected Cove",
+  ].entries()) {
+    await dock.getByRole("button", { name: new RegExp(name) }).click();
+    await expect(
+      page.getByRole("complementary", { name: `${name} destination` }),
+    ).toBeVisible();
+    await expect(page.locator(".world-passport strong")).toContainText(
+      `${i + 1}`,
+    );
+  }
+  await expect(page.locator(".world-project-panel a")).toHaveAttribute(
+    "href",
+    "/projects/connected-home",
+  );
+  await page.getByRole("button", { name: "Restart exploration" }).click();
+  await expect(page.locator(".world-passport strong")).toContainText("0");
+  await expect(page.locator(".world-project-panel")).toHaveCount(0);
+});
+test("project browser supports tabs, keyboard navigation and case-study links", async ({
+  page,
+}) => {
+  await page.goto("/#work");
+  await page.getByRole("tab", { name: /Neural Garden/ }).click();
+  await expect(
+    page.getByRole("tabpanel", { name: /Neural Garden/ }),
+  ).toContainText("Finding patterns. Supporting care.");
+  await expect(page.locator(".explorer-case-link")).toHaveAttribute(
+    "href",
+    "/projects/skin-cancer-detection",
+  );
+  await page.keyboard.press("ArrowRight");
+  await expect(
+    page.getByRole("tabpanel", { name: /People Park/ }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Next project", exact: true }).click();
+  await expect(page.locator(".explorer-story")).toContainText(
+    "Small signals. Connected systems.",
+  );
+});
+test("3D island renders and keyboard driving moves the rover", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/");
+  await expect(page.locator(".world-mode")).toContainText(
+    "INTERACTIVE 3D WORLD",
+    { timeout: 30000 },
+  );
+  await expect(page.locator(".world-canvas-layer canvas")).toBeVisible();
+  await page
+    .getByRole("button", { name: "Take the wheel", exact: true })
+    .click();
+  const before = Number(
+    await page.locator(".world-stage").getAttribute("data-rover-x"),
+  );
+  await page.keyboard.down("w");
+  await page.waitForTimeout(1000);
+  await page.keyboard.up("w");
+  await page.waitForTimeout(400);
+  const after = Number(
+    await page.locator(".world-stage").getAttribute("data-rover-x"),
+  );
+  expect(after).toBeLessThan(before - 0.1);
+  await page
+    .getByRole("navigation", { name: "Island destinations" })
+    .getByRole("button", { name: /People Park/ })
+    .click();
+  await expect(
+    page.getByRole("complementary", { name: "People Park destination" }),
+  ).toBeVisible();
+  await expect(page.locator(".world-project-panel a")).toHaveAttribute(
+    "href",
+    "/projects/workforce-analytics",
+  );
+  await page.getByRole("button", { name: "Switch to accessible map" }).click();
+  await expect(page.locator(".world-mode")).toContainText("MAP EXPLORER");
+  expect(errors).toEqual([]);
+});

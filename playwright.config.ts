@@ -10,7 +10,11 @@ export default defineConfig({
     reducedMotion: "reduce",
     launchOptions: {
       executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
-      args: ["--no-sandbox", "--disable-dev-shm-usage"],
+      args: [
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--enable-unsafe-swiftshader",
+      ],
     },
   },
   webServer: [

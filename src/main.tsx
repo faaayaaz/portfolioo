@@ -8,6 +8,7 @@ import "@fontsource-variable/fraunces";
 import "@fontsource/jetbrains-mono/400.css";
 import App from "./App";
 import "./styles.css";
+import "./world.css";
 const app = (
   <React.StrictMode>
     <HelmetProvider>

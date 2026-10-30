@@ -298,10 +298,10 @@ export const ui = {
 };
 export const sections = {
   work: {
-    title: "Behind every number,",
-    emphasis: "a better question.",
+    title: "Four stops.",
+    emphasis: "A world of questions.",
     description:
-      "A selection of analytical explorations, practical systems, and ideas made tangible.",
+      "Pick a destination. Explore the question, the approach, and what came out of it.",
     note: "Original project visuals are illustrative. Healthcare demos use synthetic data only.",
   },
   about: { title: "Curious by nature.", emphasis: "Precise by practice." },

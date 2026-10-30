@@ -1,14 +1,5 @@
-import {
-  Component,
-  lazy,
-  Suspense,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-import { Link } from "react-router-dom";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useInView, useReducedMotion } from "framer-motion";
 import {
   Activity,
   ArrowDown,
@@ -30,29 +21,14 @@ import {
   certifications,
   experience,
   profile,
-  projects,
   sections,
   skills,
-  ui,
 } from "../data/content";
-import { Button } from "../components/ui/button";
-import ProjectVisual from "../components/ProjectVisual";
 import Contact from "../components/Contact";
+import ImmersiveHero from "../components/world/ImmersiveHero";
+import ProjectExplorer from "../components/ProjectExplorer";
 const LiveLab = lazy(() => import("../components/LiveLab"));
-const NetworkScene = lazy(() => import("../components/NetworkScene"));
 gsap.registerPlugin(ScrollTrigger);
-class SceneBoundary extends Component<
-  { children: ReactNode },
-  { failed: boolean }
-> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
 function Count({ value, suffix }: { value: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null),
     inView = useInView(ref, { once: true }),
@@ -78,12 +54,9 @@ function Count({ value, suffix }: { value: number; suffix: string }) {
   );
 }
 export default function Home({ theme }: { theme: string }) {
-  const heroRef = useRef<HTMLElement>(null),
-    heroInView = useInView(heroRef);
   const root = useRef<HTMLDivElement>(null),
     reduce = useReducedMotion(),
     [skill, setSkill] = useState(0),
-    [webgl, setWebgl] = useState(false),
     [labVisible, setLabVisible] = useState(false);
   const labRef = useRef<HTMLElement>(null),
     labInView = useInView(labRef, { margin: "400px", once: true });
@@ -91,44 +64,11 @@ export default function Home({ theme }: { theme: string }) {
     if (labInView) setLabVisible(true);
   }, [labInView]);
   useEffect(() => {
-    const connection = (
-      navigator as Navigator & { connection?: { saveData?: boolean } }
-    ).connection;
-    const capable =
-      !reduce &&
-      matchMedia("(min-width: 1024px)").matches &&
-      !connection?.saveData &&
-      (navigator.hardwareConcurrency || 4) > 2;
-    const timer = setTimeout(() => {
-      if (capable) {
-        try {
-          const canvas = document.createElement("canvas");
-          const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
-          setWebgl(Boolean(gl));
-          gl?.getExtension("WEBGL_lose_context")?.loseContext();
-        } catch {
-          setWebgl(false);
-        }
-      }
-    }, 1800);
-    return () => clearTimeout(timer);
-  }, [reduce]);
-  useEffect(() => {
     if (reduce) return;
     const mm = gsap.matchMedia();
     mm.add(
       "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
       () => {
-        gsap.to(".portrait-image", {
-          y: 24,
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".hero",
-            start: "top top",
-            end: "bottom top",
-            scrub: 1,
-          },
-        });
         ScrollTrigger.create({
           trigger: ".experience-aside",
           start: "top 140px",
@@ -144,130 +84,8 @@ export default function Home({ theme }: { theme: string }) {
     return () => mm.revert();
   }, [reduce]);
   return (
-    <div ref={root}>
-      <section
-        ref={heroRef}
-        className="hero container"
-        aria-labelledby="hero-title"
-      >
-        <div className="hero-grid">
-          <motion.div
-            className="hero-copy"
-            initial={false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-          >
-            <div className="availability hero-availability">
-              <span className="status-dot" />
-              {ui.available}
-            </div>
-            <p className="eyebrow hero-eyebrow">{ui.heroEyebrow}</p>
-            <h1 id="hero-title">
-              {profile.headline[0]}
-              <br />
-              {profile.headline[1]}
-              <br />
-              <em>{profile.headline[2]}</em>
-              <span className="headline-star">✳</span>
-            </h1>
-            <p className="hero-description">{profile.introduction}</p>
-            <div className="hero-ctas">
-              <Button asChild>
-                <Link className="magnetic" to="/#work">
-                  {ui.work}
-                  <ArrowUpRight size={18} />
-                </Link>
-              </Button>
-              <a href={profile.resume} download className="resume-link">
-                {ui.resume}
-                <ArrowDownToLine size={16} />
-              </a>
-            </div>
-            <div className="hero-person">
-              <span className="person-line" />
-              <div>
-                <strong>{profile.name}</strong>
-                <span>{profile.role}</span>
-              </div>
-            </div>
-          </motion.div>
-          <motion.div
-            className="hero-art"
-            initial={false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.15 }}
-          >
-            <div className="art-coordinate mono">
-              25.2048° N &nbsp; 55.2708° E <span>DUBAI, UAE</span>
-            </div>
-            <div className="portrait-frame">
-              <picture>
-                <source
-                  srcSet="/images/fayaz-portrait-640.avif 640w, /images/fayaz-portrait.avif 1100w"
-                  sizes="(max-width: 767px) 85vw, 40vw"
-                  type="image/avif"
-                />
-                <img
-                  className="portrait-image"
-                  src="/images/fayaz-portrait-1100.webp"
-                  srcSet="/images/fayaz-portrait-640.webp 640w, /images/fayaz-portrait-1100.webp 1100w"
-                  sizes="(max-width: 767px) 85vw, 40vw"
-                  width="1100"
-                  height="1375"
-                  alt="Fayaz in a navy suit beside the Dubai waterfront at night; photo adapted from supplied portrait"
-                  fetchPriority="high"
-                />
-              </picture>
-              <div className="portrait-shade" />
-              <div className="portrait-grid" />
-              <div className="portrait-caption">
-                <span className="status-dot" />
-                <span>THE HUMAN BEHIND THE DATA</span>
-              </div>
-            </div>
-            <div className="network-layer">
-              {webgl && heroInView && (
-                <SceneBoundary>
-                  <Suspense fallback={null}>
-                    <NetworkScene theme={theme} />
-                  </Suspense>
-                </SceneBoundary>
-              )}
-            </div>
-            <div className="floating-insight">
-              <div className="insight-icon">
-                <Activity size={22} />
-              </div>
-              <div>
-                <span>From complexity to clarity.</span>
-                <strong>One insight at a time.</strong>
-              </div>
-              <svg viewBox="0 0 74 30" aria-hidden="true">
-                <path
-                  d="M0 23h14l5-10 7 15 10-26 9 20h10l5-9 5 10h9"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                />
-              </svg>
-            </div>
-            <div className="portrait-side-note mono">
-              ANALYTICS WITH PURPOSE — 001
-            </div>
-            <div className="art-corner corner-top" />
-            <div className="art-corner corner-bottom" />
-          </motion.div>
-        </div>
-        <div className="hero-bottom">
-          <span>
-            <MapPin size={13} />
-            {ui.heroCaption}
-          </span>
-          <a href="#impact">
-            SCROLL TO DISCOVER <ArrowDown size={13} />
-          </a>
-        </div>
-      </section>
+    <div ref={root} className="explorer-home">
+      <ImmersiveHero theme={theme} />
       <section id="impact" className="metrics-section">
         <div className="container metrics-grid">
           <div className="metrics-intro">
@@ -304,35 +122,7 @@ export default function Home({ theme }: { theme: string }) {
           </h2>
           <p>{sections.work.description}</p>
         </div>
-        <div className="projects-grid">
-          {projects.map((p) => (
-            <Link
-              to={`/projects/${p.slug}`}
-              className={`project-card project-${p.visual}`}
-              key={p.slug}
-            >
-              <ProjectVisual type={p.visual} />
-              <div className="project-details">
-                <div className="project-eyebrow">
-                  <span>
-                    {p.number} / {p.category}
-                  </span>
-                  <span>{p.kind}</span>
-                </div>
-                <h3>
-                  {p.title}
-                  <ArrowUpRight size={24} />
-                </h3>
-                <p>{p.description}</p>
-                <div className="tags">
-                  {p.tags.map((t) => (
-                    <span key={t}>{t}</span>
-                  ))}
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <ProjectExplorer />
         <div className="work-note">
           <ShieldCheck size={15} />
           <span>{sections.work.note}</span>
@@ -350,6 +140,20 @@ export default function Home({ theme }: { theme: string }) {
           </div>
           <div className="about-grid">
             <div className="about-heading">
+              <div className="about-person-card">
+                <img
+                  src="/images/fayaz-avatar.webp"
+                  width="76"
+                  height="76"
+                  loading="lazy"
+                  alt="Muhammed Fayaz"
+                />
+                <div>
+                  <span className="eyebrow">BEHIND THE ISLAND</span>
+                  <strong>Muhammed Fayaz</strong>
+                  <span>Analyst. Builder. Curious by default.</span>
+                </div>
+              </div>
               <h2>
                 {sections.about.title}
                 <br />

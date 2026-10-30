@@ -1,31 +1,34 @@
-# Validation — 30 October 2026
+# Data Island validation — 30 October 2026
 
-The local production application was built and run with Node 24 and Chromium. This verifies the current instance; it is not a claim of deployment or validation on a public host.
+The redesigned production application was built and run with Node 24 and Chromium. This verifies the current cloud instance and the tested build; it is not a claim of deployment or validation on a public host.
 
 | Check | Result |
 | --- | --- |
-| Frozen install (`npm ci --no-audit --no-fund`) | Passed, 501 packages |
 | TypeScript + client/server production builds | Passed |
 | Contact input/spam-protection unit tests | 5 passed |
-| Browser tests against the production server | 10 passed |
+| Browser tests against the production server | 13 passed |
+| Actual 3D rendering and WASD rover movement | Passed in Chromium with software WebGL |
+| Four map destinations, discovery counter and restart | Passed |
+| Project browser, keyboard navigation and case-study links | Passed |
 | Automated WCAG AA checks | Passed in all five themes |
 | Responsive layout / horizontal overflow | Passed at 360, 768, 1024, 1440, 3840 pixels |
-| Case studies, PDF download, filters, CSV export, theme persistence, command menu, mobile drawer | Passed |
-| Server rendering, hydration, canonical/social metadata, sitemap, robots, icons, HTTP 404 | Passed |
+| Case studies, PDF download, lab filters, CSV export, theme persistence, command menu, mobile drawer and contact draft | Passed |
 
-Final Lighthouse mobile audit of the local production homepage:
+Latest Lighthouse mobile audit of the local production homepage:
 
 | Category | Score |
 | --- | ---: |
-| Performance | 95 |
+| Performance | 96 |
 | Accessibility | 100 |
 | Best practices | 100 |
 | SEO | 100 |
 
-First contentful paint: 2.3 seconds. Largest contentful paint: 2.4 seconds. Total blocking time: 30 milliseconds. Cumulative layout shift: 0.009. Scores can vary by device, network, hosting and run; this is a local simulated-mobile audit, not a guarantee for every page or device. Automated accessibility results are not a complete manual accessibility audit.
+First contentful paint: 2.3 seconds. Largest contentful paint: 2.3 seconds. Total blocking time: 10 milliseconds. Cumulative layout shift: 0.011. These measurements cover the illustrated-map initial mobile experience. They do not measure 3D frame rate or guarantee the same score after explicitly enabling 3D on a phone. Scores vary by hosting, network, device and run. Automated accessibility results are not a complete manual audit.
 
-The 3D scene is a separately lazy-loaded desktop enhancement. It is skipped on mobile, reduced-motion, data-saving, and low-power configurations, and falls back when WebGL is unavailable. The build reports its large optional chunk; it is not part of the mobile audit's initial download.
+The island scene is a lazy-loaded desktop enhancement and an explicit mobile option. It starts as an illustrated map on screens below 700px, reduced-motion, low-power and data-saving configurations. Every destination and case study remains reachable through HTML controls, including after a WebGL failure. The rendering loop pauses when offscreen or the document is hidden. The large optional Three.js chunk is approximately 225 kB gzipped; it is not part of the initial mobile download. No fixed frame-rate guarantee is made.
 
-Direct SMTP delivery was not tested because no provider was configured. The tested contact flow validates the message, prepares an email draft, and offers a working mailto link without claiming delivery. Calendar scheduling uses an email request; no scheduling account URL was supplied. Original dashboard screenshots/model artifacts and public project repositories were not supplied; project visuals are labeled illustrations and the live lab uses synthetic data. Optional Arabic localization is not implemented.
+The full original contact, project and dashboard checks were retained; the new checks exercise meaningful interactive behavior rather than only the presence of a canvas. Windows-compatible `npm start` remains in place. Installation dependencies and lockfile are unchanged by the redesign.
 
-Configuration fields `install_script` and `start_skill` were saved to the cloud environment draft. They have not been published. No website deployment was performed.
+Direct SMTP delivery is still untested because no provider is configured. The contact flow prepares a complete email draft without claiming delivery. Calendar scheduling uses an email request. Project visuals and healthcare data remain illustrative/synthetic. Arabic localization and original employer dashboard screenshots are not included.
+
+See [design research](DESIGN-RESEARCH.md) for the professional references actually examined and the live-network limitations. No website deployment or environment publication was performed for this redesign.

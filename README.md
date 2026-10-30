@@ -1,6 +1,17 @@
-# Fayaz — The Clinical Data Observatory
+# Fayaz — Data Island
 
-A personal portfolio for Muhammed Fayaz, built with React 18, TypeScript, Vite, Tailwind, styled shadcn/Radix primitives, Framer Motion, GSAP, React Three Fiber, and Recharts.
+An explorable 3D personal portfolio for Muhammed Fayaz, built with React 18, TypeScript, Vite, Tailwind, styled shadcn/Radix primitives, Framer Motion, GSAP, React Three Fiber, and Recharts.
+
+![Data Island — interactive 3D portfolio preview](docs/island-preview.png)
+
+## Explore the island
+
+- Drive the rover with **WASD or arrow keys**, click the ground to move, or use the on-screen touch controls.
+- Click a building or use the destination dock to explore Care Campus, Neural Garden, People Park and Connected Cove. Each destination opens the corresponding real case study.
+- Collect six small insights, discover four destinations, zoom/rotate the view, or restart the exploration.
+- The project browser below the island supports tabs, arrow keys, and previous/next controls.
+- Phones under 700px, reduced-motion preferences, data-saving mode and low-power devices start with the illustrated map. Visitors can explicitly enter 3D. WebGL failures return to the map; all project content stays accessible without 3D. The scene pauses when offscreen or the page is hidden.
+- The procedural island and SVG map are original. See [design research](docs/DESIGN-RESEARCH.md) for the verified professional references and research limitations.
 
 ## View in Visual Studio Code
 
@@ -9,11 +20,12 @@ Install Node.js 22.9 or newer if `node --version` is unavailable. Open your loca
 ```sh
 git fetch origin
 git switch feat/fayaz-portfolio
-npm ci
-npm run dev
+git pull origin feat/fayaz-portfolio
+npm.cmd ci
+npm.cmd run dev
 ```
 
-Open the local address printed by Vite in your own browser (normally localhost, port 5173). These commands work in Windows PowerShell, Command Prompt, macOS and Linux. Run `npm run dev:api` in a second terminal to enable the contact API during development. The full production server is available with `npm run build` followed by `npm start` (port 3001).
+Open the local address printed by Vite in your own browser (normally localhost, port 5173). This example uses Windows PowerShell’s `npm.cmd` wrapper so execution-policy restrictions do not block npm. On macOS/Linux, use `npm` in place of `npm.cmd`. Run `npm run dev:api` in a second terminal to enable the contact API during development. The full production server is available with `npm run build` followed by `npm start` (port 3001).
 
 If you have not cloned the repository, use VS Code’s **Git: Clone** command with `https://github.com/faaayaaz/portfolioo.git`, open the cloned folder, and follow the same steps. You can also select the `feat/fayaz-portfolio` branch on GitHub and choose **Code → Download ZIP**.
 
@@ -44,7 +56,9 @@ Serve through the Node server for the complete experience. A static host needs S
 
 - `src/data/content.ts`: profile, résumé-backed achievements, skills, experience, education, project case studies, major section copy, theme labels, and contact text.
 - `src/data/healthcare.ts`: deterministic synthetic demonstration data and KPI aggregation.
-- `src/styles.css`: five theme token sets, responsive layouts, motion/accessibility rules.
+- `src/styles.css`: shared theme/layout tokens. `src/world.css`: island and project-browser styling.
+- `src/data/world.ts`: island copy, destinations, coordinates and collectible insights.
+- `src/components/world/`: procedural 3D scene, illustrated map, controls and discovery UI.
 - `public/Muhammed_Fayaz_Resume.pdf`: the supplied résumé, downloaded by the site.
 - `public/images/`: optimized AVIF/WebP portrait assets. The portrait is an AI-assisted adaptation of the user's supplied waterfront photograph, rather than an unchanged original. Replace these files if an unmodified photograph is preferred. The other supplied photographs were not added.
 - `public/og-image.svg`: editable vector source for the social card; PNG and touch icon are provided.
@@ -70,7 +84,7 @@ npm run test:browser      # Playwright responsive, navigation, lab, contact & ax
 
 The browser tests use `/usr/bin/chromium` in this cloud environment. Set `CHROMIUM_PATH` to an installed Chromium executable elsewhere. Start servers as above; Playwright will start them if they are absent. Tests expect unconfigured SMTP so draft mode can be exercised without sending mail. Restart your local API if repeat test runs reach the spam-protection rate limit.
 
-Checks cover widths 360, 768, 1024, 1440 and 3840, four case-study routes, CSV filtering, PDF downloads, mobile navigation, command palette, persisted themes, and automated WCAG AA checks for all five themes. Automated accessibility checks do not replace a full human audit. The default theme follows a visitor's light/dark system preference on first visit; explicit choices persist without a load flash. Reduced motion, low-power devices, mobile viewports, WebGL failures and data-saving mode fall back from the optional 3D network.
+Checks cover widths 360, 768, 1024, 1440 and 3840, four case-study routes, CSV filtering, PDF downloads, mobile navigation, command palette, persisted themes, and automated WCAG AA checks for all five themes. Automated accessibility checks do not replace a full human audit. The default theme follows a visitor's light/dark system preference on first visit; explicit choices persist without a load flash. The island has an accessible illustrated-map alternative.
 
 ## Optional real content for launch
 
